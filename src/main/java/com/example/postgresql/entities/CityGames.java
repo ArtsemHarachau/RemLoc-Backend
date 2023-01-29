@@ -1,6 +1,10 @@
 package com.example.postgresql.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -8,7 +12,7 @@ import java.util.Set;
 public class CityGames {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idGame", nullable = false)
     private Long idGame;
 
@@ -31,11 +35,15 @@ public class CityGames {
     private String countryForGame;
 
 
-    @ManyToMany(mappedBy = "playingGames", cascade = CascadeType.ALL)
-    Set<GameParticipants> playing;
+    @ManyToMany(mappedBy = "playingGames", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+//    @JsonManagedReference
+    @JsonIgnore
+    private Set<GameParticipants> playing;
 
 
-    @OneToMany(mappedBy = "cityGame")
+    @OneToMany(mappedBy = "cityGame", fetch=FetchType.EAGER)
+//    @JsonManagedReference
+    @JsonIgnore
     private Set<PlacesOfGame> placesOfGame;
 
 
@@ -94,6 +102,22 @@ public class CityGames {
     public void setCountryForGame(String countryForGame) {
         this.countryForGame = countryForGame;
     }
+
+//    public List<GameParticipants> getPlaying() {
+//        return playing;
+//    }
+//
+//    public void setPlaying(List<GameParticipants> playing) {
+//        this.playing = playing;
+//    }
+//
+//    public List<PlacesOfGame> getPlacesOfGame() {
+//        return placesOfGame;
+//    }
+//
+//    public void setPlacesOfGame(List<PlacesOfGame> placesOfGame) {
+//        this.placesOfGame = placesOfGame;
+//    }
 
     public Set<GameParticipants> getPlaying() {
         return playing;

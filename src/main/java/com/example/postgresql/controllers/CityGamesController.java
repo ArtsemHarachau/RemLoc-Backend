@@ -3,6 +3,7 @@ package com.example.postgresql.controllers;
 import com.example.postgresql.entities.Administrators;
 import com.example.postgresql.entities.CityGames;
 import com.example.postgresql.entities.GameParticipants;
+import com.example.postgresql.entities.PlacesOfGame;
 import com.example.postgresql.services.CityGamesService;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -24,19 +24,6 @@ public class CityGamesController {
     @Autowired
     private CityGamesService cityGamesService;
 
-    @RequestMapping(value = "/index")
-    public String index(){
-        return "index";
-    }
-
-
-    @GetMapping("/createnewgame")
-    public String createNewGame(/*Model model*/) {
-//        CityGames cityGame = new CityGames();
-//        model.addAttribute("cityGame", cityGame);
-        return "newcitygame";//
-    }
-
 //    @PostMapping("/saveCityGame")
 //    public String saveCityGame(@ModelAttribute("cityGame") CityGames cityGame) {
 //        cityGamesService.saveCityGame(cityGame);
@@ -44,11 +31,108 @@ public class CityGamesController {
 //    }
 
 
-    @PostMapping("/saveCityGame")
+    /**
+     *
+     * @param cityGame
+     * save cityGame into database
+     */
+    @PostMapping("/savegame")
 //    @CrossOrigin(origins = "http://localhost:4200")
     void saveCityGame(@RequestBody CityGames cityGame) {
+
         cityGamesService.saveCityGame(cityGame);
     }
+
+    /**
+     *
+     * @param cityGame
+     * add new player to cityGame
+     */
+    @PostMapping("/addplayer")
+    void addPlayerToGame(@RequestBody CityGames cityGame){
+
+    }
+
+    /**
+     *
+     * @param cityGame
+     * add admin to cityGame
+     */
+    @PostMapping("/addadmin")
+    void addAdminToGame(@RequestBody CityGames cityGame){
+
+    }
+
+
+    /**
+     *
+     * @param id
+     * find cityGame by id
+     * @return cityGame from database
+     */
+    @GetMapping("/citygame/{id}")
+    public ResponseEntity<CityGames> findGameById(@PathVariable Long id){
+        Optional<CityGames> cityGame = cityGamesService.findGameById(id);
+
+        return cityGame.map(cityGames -> new ResponseEntity<>(cityGames, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(cityGame.get(), HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping("/addplacetogame")
+    public void addNewPlaceToGame(@RequestBody CityGames cityGame){
+
+        Set<PlacesOfGame> setPlacesOfGame = new HashSet<>();
+        PlacesOfGame placeOfGame = new PlacesOfGame();
+        placeOfGame.setOrderId(1);
+        placeOfGame.setAddress("Serbska 17");
+        placeOfGame.setLegend("Lalalalalaa");
+        placeOfGame.setPhotoLink("Blablablabla");
+        placeOfGame.setLatitudeCoord(1.1);
+        placeOfGame.setLongitudeCoord(1.1);
+
+        setPlacesOfGame.add(placeOfGame);
+
+        cityGame.setPlacesOfGame(setPlacesOfGame);
+
+        cityGamesService.saveCityGame(cityGame);
+    }
+
+    @PostMapping("/updatecitygame/{id}")
+    public ResponseEntity<CityGames> updateGame(@RequestBody CityGames cityGame, @PathVariable Long id){
+//        CityGames copiedCityGame = cityGamesService.findGameById(id);
+
+        Optional<CityGames> cityGameForUpdate = cityGamesService.findGameById(id);
+        return cityGameForUpdate
+                .map(updatedCityGame -> {
+                    updatedCityGame.setNameOfGame(cityGame.getNameOfGame());
+                    updatedCityGame.setCityForGame(cityGame.getCityForGame());
+                    updatedCityGame.setNameOfGame(cityGame.getNameOfGame());
+                    updatedCityGame.setAccessCode(cityGame.getAccessCode());
+                    updatedCityGame.setCountryForGame(cityGame.getCountryForGame());
+                    updatedCityGame.setDateForStartGame(cityGame.getDateForStartGame());
+                    updatedCityGame.setDateForEndGame(cityGame.getDateForEndGame());
+                    updatedCityGame.setPlacesOfGame(cityGame.getPlacesOfGame());
+                    updatedCityGame.setPlaying(cityGame.getPlaying());
+                    cityGamesService.saveCityGame(updatedCityGame);
+                    return new ResponseEntity<>(updatedCityGame, HttpStatus.OK);
+                })
+                .orElseGet(() -> {
+                    cityGamesService.saveCityGame(cityGame);
+                    return new ResponseEntity<>(cityGame, HttpStatus.NOT_FOUND);
+                });
+
+    }
+
+
+    /**
+     *
+     * @param id
+     * delete citGame by id
+     */
+    @DeleteMapping("/citygame/{id}")
+    public void deleteGameById(@PathVariable Long id){
+        cityGamesService.deleteGameById(id);
+    }
+
 
 
 
@@ -95,18 +179,18 @@ public class CityGamesController {
                 cityGames.getCityForGame(), cityGames.getDateForStartGame(), cityGames.getCountryForGame());
 
         System.out.println("IDGAME: -> " + testIdGame);
-        Set<GameParticipants> setParticipants = new HashSet<GameParticipants>();
+        Set<GameParticipants> listParticipants = new HashSet<>();
         Administrators part1 = new Administrators();
         part1.nickname = "Lala12";
 
-        Set<CityGames> setGames = new HashSet<CityGames>();
-        setGames.add(cityGames);
+        Set<CityGames> listGames = new HashSet<>();
+        listGames.add(cityGames);
 
-        part1.setPlayingGames(setGames);
+        part1.setPlayingGames(listGames);
 
-        setParticipants.add(part1);
+        listParticipants.add(part1);
 
-        cityGames.setPlaying(setParticipants);
+        cityGames.setPlaying(listParticipants);
 
 
 

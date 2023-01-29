@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class PlacesOfGameId implements Serializable {
 
-    private String address;
+    private Integer orderId;
     private CityGames cityGame;
 
     @Override

@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Optional;
+
 @Service
 public class CityGamesService {
 
@@ -30,6 +32,15 @@ public class CityGamesService {
                               String countryForGame) {
         return cityGamesRepository.getCityGameIdByAnotherValues(nameOfGame, accessCode, cityForGame, dateForStartGame,
                 countryForGame);
+    }
+
+
+    public Optional<CityGames> findGameById(Long idGame){
+        return cityGamesRepository.findById(idGame);
+    }
+
+    public void deleteGameById(Long idGame){
+        cityGamesRepository.deleteById(idGame);
     }
 
 //    public CityGames saveCityGame(CityGames cityGame){

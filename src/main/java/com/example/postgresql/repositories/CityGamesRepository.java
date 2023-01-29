@@ -34,6 +34,9 @@ public interface CityGamesRepository extends JpaRepository<CityGames,Long> {
                                       @Param("countryForGame") String countryForGame);
 
 
+//    CityGames findGameById(Long idGame);
+
+
 //    @Query("SELECT cg.idGame FROM CityGames cg WHERE cg.nameOfGame = :nameOfGame and cg.accessCode = :accessCode and " +
 //            "cg.cityForGame = :cityForGame and cg.dateForStartGame = :dateForStartGame and " +
 //            "cg.countryForGame = :countryForGame")
