@@ -5,6 +5,11 @@ import com.example.postgresql.entities.CityGames;
 import com.example.postgresql.entities.GameParticipants;
 import com.example.postgresql.entities.PlacesOfGame;
 import com.example.postgresql.services.CityGamesService;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.*;
+import com.google.firebase.internal.NonNull;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -14,12 +19,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class CityGamesController {
+
+    private final CityGames cityGameCopy = new CityGames();
 
     @Autowired
     private CityGamesService cityGamesService;
@@ -38,7 +47,10 @@ public class CityGamesController {
      */
     @PostMapping("/savegame")
 //    @CrossOrigin(origins = "http://localhost:4200")
-    void saveCityGame(@RequestBody CityGames cityGame) {
+    void saveCityGame(@RequestBody CityGames cityGame) throws IOException {
+        cityGameCopy.setNameOfGame(cityGame.getNameOfGame());
+        cityGameCopy.setCityForGame(cityGame.getCityForGame());
+        initFirebase();
 
         cityGamesService.saveCityGame(cityGame);
     }
@@ -226,4 +238,45 @@ public class CityGamesController {
 //    public Iterable<CityGames> listGames(Model model) {
 //        return cityGamesService.listAllGames();
 //    }
+
+    public void initFirebase() throws IOException {
+        FileInputStream serviceAccount = new FileInputStream("src\\main\\resources\\remloc1-fbe72-firebase-adminsdk-h130v-9966196e2e.json");
+
+        FirebaseOptions options = null;
+        try {
+            options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://remloc1-fbe72-default-rtdb.europe-west1.firebasedatabase.app/")
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        FirebaseApp.initializeApp(options);
+
+        addDataToFirebase();
+    }
+
+    private void addDataToFirebase() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("/Games/"+cityGameCopy.getCityForGame()+"/pl/1/hint", "1");
+        updates.put("/Games/"+cityGameCopy.getCityForGame()+"/pl/1/latitude", "1");
+        updates.put("/Games/"+cityGameCopy.getCityForGame()+"/pl/1/legend", "1");
+        updates.put("/Games/"+cityGameCopy.getCityForGame()+"/pl/1/longitude", "1");
+        updates.put("/Games/"+cityGameCopy.getCityForGame()+"/pl/1/placeName", cityGameCopy.getCityForGame());
+
+        ref.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError error, DatabaseReference ref) {
+                if (error != null) {
+                    // An error occurred while updating the data
+                } else {
+                    // Data updated successfully!
+                }
+            }
+        });
+    }
+
 }
