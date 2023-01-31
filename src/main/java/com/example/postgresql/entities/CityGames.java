@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,16 +36,17 @@ public class CityGames {
     private String countryForGame;
 
 
-    @ManyToMany(mappedBy = "playingGames", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
-//    @JsonManagedReference
+    @ManyToMany(mappedBy = "playingGames", cascade = CascadeType.ALL)
+//    @JsonIgnore
+    @JsonManagedReference
     @JsonIgnore
-    private Set<GameParticipants> playing;
+    private Set<GameParticipants> playing = new HashSet<>();;
 
 
     @OneToMany(mappedBy = "cityGame", fetch=FetchType.EAGER)
 //    @JsonManagedReference
     @JsonIgnore
-    private Set<PlacesOfGame> placesOfGame;
+    private Set<PlacesOfGame> placesOfGame = new HashSet<>();;
 
 
     public Long getIdGame() {
@@ -134,4 +136,6 @@ public class CityGames {
     public void setPlacesOfGame(Set<PlacesOfGame> placesOfGame) {
         this.placesOfGame = placesOfGame;
     }
+
+
 }

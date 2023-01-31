@@ -9,6 +9,8 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
+
 
 @Entity
 //@Table(name = "GameParticipants")
@@ -32,8 +34,9 @@ public abstract class GameParticipants {
     @JoinTable(name = "playingGames",
             joinColumns = @JoinColumn(name = "idParticipant"),
             inverseJoinColumns = @JoinColumn(name = "idGame"))
-//    @JsonBackReference
-    public Set<CityGames> playingGames;
+    @JsonBackReference
+    @JsonIgnore
+    public Set<CityGames> playingGames = new HashSet<>();;
 
 
     public Long getIdParticipant() {
@@ -67,4 +70,6 @@ public abstract class GameParticipants {
     public void setPlayingGames(Set<CityGames> playingGames) {
         this.playingGames = playingGames;
     }
+
+
 }

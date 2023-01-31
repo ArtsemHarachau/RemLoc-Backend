@@ -23,13 +23,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class CityGamesController {
 
     private final CityGames cityGameCopy = new CityGames();
-
     @Autowired
     private CityGamesService cityGamesService;
 
@@ -45,6 +48,20 @@ public class CityGamesController {
      * @param cityGame
      * save cityGame into database
      */
+//    @PostMapping("/savegame")
+////    @CrossOrigin(origins = "http://localhost:4200")
+//    void saveCityGame(@RequestBody CityGames cityGame) throws JsonProcessingException {
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String json = objectMapper.writeValueAsString(cityGame);
+//        System.out.println(json);
+//
+////        for(GameParticipants elem: cityGame.getPlaying()){
+////            System.out.println(elem.nickname);
+////        }
+////
+////        cityGamesService.saveCityGame(cityGame);
+//    }
     @PostMapping("/savegame")
 //    @CrossOrigin(origins = "http://localhost:4200")
     void saveCityGame(@RequestBody CityGames cityGame) throws IOException {
@@ -211,34 +228,6 @@ public class CityGamesController {
         return new ResponseEntity<>(testIdGame, HttpStatus.OK);
     }
 
-
-//    @PostMapping("/createNewGame")
-//    public String createNewCityGame(Model model){
-//        CityGames cityGame = new CityGames();
-//        model.addAttribute("cityGame", cityGame);
-//
-//    }
-
-
-//    /**
-//     * Save city game to database.
-//     *
-//     */
-//    @RequestMapping(value = "/city/game", method = RequestMethod.POST)
-//    public ResponseEntity<CityGames> createCityGame(@RequestBody @NotNull CityGames cityGame) {
-//        cityGamesService.saveCityGame(cityGame);
-//        return ResponseEntity.ok().body(cityGame);
-//    }
-//
-//    /**
-//     * List all games.
-//     *
-//     */
-//    @RequestMapping(value = "/city/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public Iterable<CityGames> listGames(Model model) {
-//        return cityGamesService.listAllGames();
-//    }
-
     public void initFirebase() throws IOException {
         FileInputStream serviceAccount = new FileInputStream("src\\main\\resources\\remloc1-fbe72-firebase-adminsdk-h130v-9966196e2e.json");
 
@@ -279,4 +268,31 @@ public class CityGamesController {
         });
     }
 
+
+//    @PostMapping("/createNewGame")
+//    public String createNewCityGame(Model model){
+//        CityGames cityGame = new CityGames();
+//        model.addAttribute("cityGame", cityGame);
+//
+//    }
+
+
+//    /**
+//     * Save city game to database.
+//     *
+//     */
+//    @RequestMapping(value = "/city/game", method = RequestMethod.POST)
+//    public ResponseEntity<CityGames> createCityGame(@RequestBody @NotNull CityGames cityGame) {
+//        cityGamesService.saveCityGame(cityGame);
+//        return ResponseEntity.ok().body(cityGame);
+//    }
+//
+//    /**
+//     * List all games.
+//     *
+//     */
+//    @RequestMapping(value = "/city/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public Iterable<CityGames> listGames(Model model) {
+//        return cityGamesService.listAllGames();
+//    }
 }

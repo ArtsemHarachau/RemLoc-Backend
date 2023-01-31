@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import com.example.postgresql.idClasses.PlacesOfGameId;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "PlacesOfGame")
@@ -93,4 +98,6 @@ public class PlacesOfGame implements Serializable {
     public void setCityGame(CityGames cityGame) {
         this.cityGame = cityGame;
     }
+
+
 }
