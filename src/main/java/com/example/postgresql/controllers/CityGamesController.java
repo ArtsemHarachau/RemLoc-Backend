@@ -5,11 +5,16 @@ import com.example.postgresql.entities.CityGames;
 import com.example.postgresql.entities.GameParticipants;
 import com.example.postgresql.entities.PlacesOfGame;
 import com.example.postgresql.services.CityGamesService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.*;
 import com.google.firebase.internal.NonNull;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -45,7 +50,7 @@ public class CityGamesController {
 
     /**
      *
-     * @param cityGame
+     * @param jsonString
      * save cityGame into database
      */
 //    @PostMapping("/savegame")
@@ -64,10 +69,61 @@ public class CityGamesController {
 //    }
     @PostMapping("/savegame")
 //    @CrossOrigin(origins = "http://localhost:4200")
-    void saveCityGame(@RequestBody CityGames cityGame) throws IOException {
-        cityGameCopy.setNameOfGame(cityGame.getNameOfGame());
-        cityGameCopy.setCityForGame(cityGame.getCityForGame());
-        initFirebase();
+    void saveCityGame(@RequestBody String jsonString) throws IOException {
+//        cityGameCopy.setNameOfGame(cityGame.getNameOfGame());
+//        cityGameCopy.setCityForGame(cityGame.getCityForGame());
+//        initFirebase();
+
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        CityGames cityGame = objectMapper.readValue(jsonString, CityGames.class);
+
+        JsonObject data = new Gson().fromJson(jsonString, JsonObject.class);
+
+        CityGames cityGame = new CityGames();
+        cityGame.setNameOfGame(data.get("nameOfGame").getAsString());
+        cityGame.setDateForStartGame(data.get("dateForStartGame").getAsString());
+        cityGame.setCityForGame(data.get("cityForGame").getAsString());
+        cityGame.setCountryForGame(data.get("countryForGame").getAsString());
+        cityGame.setAccessCode(Integer.parseInt(data.get("accessCode").getAsString()));
+//        System.out.println(data);
+//        System.out.println(cityGame.getNameOfGame());
+//        System.out.println(cityGame.getDateForStartGame());
+//        System.out.println(cityGame.getCityForGame());
+//        System.out.println(cityGame.getCountryForGame());
+//        System.out.println(cityGame.getAccessCode());
+
+
+
+
+        JsonArray names = data.get("playing").getAsJsonArray();
+        for(JsonElement element : names){
+            JsonObject object = element.getAsJsonObject();
+
+            Administrators admin = new Administrators();
+
+            //add values to idParticipant and nickname to new admin
+//            admin.setIdParticipant(Long.parseLong(object.get("idParticipant").getAsString()));
+            admin.setNickname(object.get("nickname").getAsString());
+
+            //add set of city games for this new admin
+            Set<CityGames> setCityGames = new HashSet<>();
+            setCityGames.add(cityGame);
+            admin.setPlayingGames(setCityGames);
+
+            //add to this new city game info about it's admin
+            Set<GameParticipants> setParticipants = new HashSet<>();
+            setParticipants.add(admin);
+            cityGame.setPlaying(setParticipants);
+
+
+
+//            System.out.println(object);
+        }
+//        System.out.println(cityGame.getIdGame());
+
+//        GameParticipants gameParticipants = new Administrators();
+//        gameParticipants.set;
 
         cityGamesService.saveCityGame(cityGame);
     }

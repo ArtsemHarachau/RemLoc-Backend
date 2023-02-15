@@ -1,9 +1,6 @@
 package com.example.postgresql.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -35,8 +32,8 @@ public abstract class GameParticipants {
             joinColumns = @JoinColumn(name = "idParticipant"),
             inverseJoinColumns = @JoinColumn(name = "idGame"))
     @JsonBackReference
-    @JsonIgnore
-    public Set<CityGames> playingGames = new HashSet<>();;
+//    @JsonIgnore
+    public Set<CityGames> playingGames = new HashSet<>();
 
 
     public Long getIdParticipant() {

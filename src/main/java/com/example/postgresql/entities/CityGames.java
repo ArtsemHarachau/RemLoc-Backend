@@ -40,14 +40,13 @@ public class CityGames {
 //    @JsonIgnore
     @JsonManagedReference
     @JsonIgnore
-    private Set<GameParticipants> playing = new HashSet<>();;
+    private Set<GameParticipants> playing = new HashSet<>();
 
 
     @OneToMany(mappedBy = "cityGame", fetch=FetchType.EAGER)
 //    @JsonManagedReference
-    @JsonIgnore
-    private Set<PlacesOfGame> placesOfGame = new HashSet<>();;
-
+//    @JsonIgnore
+    private Set<PlacesOfGame> placesOfGame = new HashSet<>();
 
     public Long getIdGame() {
         return idGame;
