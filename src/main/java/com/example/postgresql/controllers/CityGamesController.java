@@ -4,17 +4,17 @@ import com.example.postgresql.entities.Administrators;
 import com.example.postgresql.entities.CityGames;
 import com.example.postgresql.entities.GameParticipants;
 import com.example.postgresql.entities.PlacesOfGame;
+import com.example.postgresql.idClasses.PlacesOfGameId;
 import com.example.postgresql.services.CityGamesService;
+import com.example.postgresql.services.PlacesOfGameService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.google.api.client.json.Json;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.*;
 import com.google.firebase.internal.NonNull;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -41,42 +41,20 @@ public class CityGamesController {
     @Autowired
     private CityGamesService cityGamesService;
 
-//    @PostMapping("/saveCityGame")
-//    public String saveCityGame(@ModelAttribute("cityGame") CityGames cityGame) {
-//        cityGamesService.saveCityGame(cityGame);
-//        return "redirect:/";//
-//    }
-
+    @Autowired
+    private PlacesOfGameService placesOfGameService;
 
     /**
      *
      * @param jsonString
      * save cityGame into database
      */
-//    @PostMapping("/savegame")
-////    @CrossOrigin(origins = "http://localhost:4200")
-//    void saveCityGame(@RequestBody CityGames cityGame) throws JsonProcessingException {
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String json = objectMapper.writeValueAsString(cityGame);
-//        System.out.println(json);
-//
-////        for(GameParticipants elem: cityGame.getPlaying()){
-////            System.out.println(elem.nickname);
-////        }
-////
-////        cityGamesService.saveCityGame(cityGame);
-//    }
     @PostMapping("/savegame")
 //    @CrossOrigin(origins = "http://localhost:4200")
     void saveCityGame(@RequestBody String jsonString) throws IOException {
 //        cityGameCopy.setNameOfGame(cityGame.getNameOfGame());
 //        cityGameCopy.setCityForGame(cityGame.getCityForGame());
 //        initFirebase();
-
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        CityGames cityGame = objectMapper.readValue(jsonString, CityGames.class);
 
         JsonObject data = new Gson().fromJson(jsonString, JsonObject.class);
 
@@ -86,14 +64,6 @@ public class CityGamesController {
         cityGame.setCityForGame(data.get("cityForGame").getAsString());
         cityGame.setCountryForGame(data.get("countryForGame").getAsString());
         cityGame.setAccessCode(Integer.parseInt(data.get("accessCode").getAsString()));
-//        System.out.println(data);
-//        System.out.println(cityGame.getNameOfGame());
-//        System.out.println(cityGame.getDateForStartGame());
-//        System.out.println(cityGame.getCityForGame());
-//        System.out.println(cityGame.getCountryForGame());
-//        System.out.println(cityGame.getAccessCode());
-
-
 
 
         JsonArray names = data.get("playing").getAsJsonArray();
@@ -116,14 +86,7 @@ public class CityGamesController {
             setParticipants.add(admin);
             cityGame.setPlaying(setParticipants);
 
-
-
-//            System.out.println(object);
         }
-//        System.out.println(cityGame.getIdGame());
-
-//        GameParticipants gameParticipants = new Administrators();
-//        gameParticipants.set;
 
         cityGamesService.saveCityGame(cityGame);
     }
@@ -149,63 +112,106 @@ public class CityGamesController {
     }
 
 
+//    /**
+//     *
+//     * @param id
+//     * find cityGame by id
+//     * @return cityGame from database
+//     */
+//    @GetMapping("/citygame/{id}")
+//    public ResponseEntity<CityGames> findGameById(@PathVariable Long id){
+//        Optional<CityGames> cityGame = cityGamesService.findGameById(id);
+//
+//        return cityGame.map(cityGames -> new ResponseEntity<>(cityGames, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(cityGame.get(), HttpStatus.NOT_FOUND));
+//    }
+
     /**
      *
-     * @param id
-     * find cityGame by id
-     * @return cityGame from database
+     * @param jsonString
+     * @throws IOException
      */
-    @GetMapping("/citygame/{id}")
-    public ResponseEntity<CityGames> findGameById(@PathVariable Long id){
-        Optional<CityGames> cityGame = cityGamesService.findGameById(id);
-
-        return cityGame.map(cityGames -> new ResponseEntity<>(cityGames, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(cityGame.get(), HttpStatus.NOT_FOUND));
-    }
-
     @PostMapping("/addplacetogame")
-    public void addNewPlaceToGame(@RequestBody CityGames cityGame){
+    public void addNewPlaceToGame(@RequestBody String jsonString) throws IOException{
 
-        Set<PlacesOfGame> setPlacesOfGame = new HashSet<>();
-        PlacesOfGame placeOfGame = new PlacesOfGame();
-        placeOfGame.setOrderId(1);
-        placeOfGame.setAddress("Serbska 17");
-        placeOfGame.setLegend("Lalalalalaa");
-        placeOfGame.setPhotoLink("Blablablabla");
-        placeOfGame.setLatitudeCoord(1.1);
-        placeOfGame.setLongitudeCoord(1.1);
+        JsonObject data = new Gson().fromJson(jsonString, JsonObject.class);
 
-        setPlacesOfGame.add(placeOfGame);
+        PlacesOfGame newPlace = new PlacesOfGame();
+        newPlace.setOrderId(data.get("orderId").getAsInt());
+        newPlace.setAddress(data.get("address").getAsString());
+        newPlace.setLatitudeCoord(data.get("latitudeCoord").getAsDouble());
+        newPlace.setLongitudeCoord(data.get("longitudeCoord").getAsDouble());
+        newPlace.setLegend(data.get("legend").getAsString());
+        newPlace.setPhotoLink(data.get("photoLink").getAsString());
 
-        cityGame.setPlacesOfGame(setPlacesOfGame);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(newPlace);
+        System.out.println(json);
 
-        cityGamesService.saveCityGame(cityGame);
+        JsonObject cityGameObject = data.get("cityGame").getAsJsonObject();
+
+        Long gameId = cityGamesService.getCityGameId(
+                cityGameObject.get("nameOfGame").getAsString(),
+                cityGameObject.get("accessCode").getAsInt(),
+                cityGameObject.get("cityForGame").getAsString(),
+                cityGameObject.get("dateForStartGame").getAsString(),
+                cityGameObject.get("countryForGame").getAsString());
+
+        CityGames cityGameForUpdate = cityGamesService.findGameById(gameId);
+
+        if(cityGameForUpdate == null){
+            System.out.println("This is null!");
+        }
+
+        json = objectMapper.writeValueAsString(cityGameForUpdate);
+        System.out.println(json);
+
+
+        newPlace.setCityGame(cityGameForUpdate);
+        json = objectMapper.writeValueAsString(newPlace);
+        System.out.println(json);
+
+        Set<PlacesOfGame> setPlaces = new HashSet<>();
+        setPlaces.add(newPlace);
+
+        newPlace.getCityGame().setPlacesOfGame(setPlaces);
+
+        json = objectMapper.writeValueAsString(newPlace.getCityGame());
+        System.out.println(json);
+
+
+//        cityGameForUpdate.setPlacesOfGame(setPlaces);
+
+//        cityGamesService.saveCityGame(newPlace.getCityGame());
+
+//        cityGamesService.saveCityGame(newGame);
+        placesOfGameService.saveNewPlace(newPlace);
     }
 
     @PostMapping("/updatecitygame/{id}")
-    public ResponseEntity<CityGames> updateGame(@RequestBody CityGames cityGame, @PathVariable Long id){
-//        CityGames copiedCityGame = cityGamesService.findGameById(id);
-
-        Optional<CityGames> cityGameForUpdate = cityGamesService.findGameById(id);
-        return cityGameForUpdate
-                .map(updatedCityGame -> {
-                    updatedCityGame.setNameOfGame(cityGame.getNameOfGame());
-                    updatedCityGame.setCityForGame(cityGame.getCityForGame());
-                    updatedCityGame.setNameOfGame(cityGame.getNameOfGame());
-                    updatedCityGame.setAccessCode(cityGame.getAccessCode());
-                    updatedCityGame.setCountryForGame(cityGame.getCountryForGame());
-                    updatedCityGame.setDateForStartGame(cityGame.getDateForStartGame());
-                    updatedCityGame.setDateForEndGame(cityGame.getDateForEndGame());
-                    updatedCityGame.setPlacesOfGame(cityGame.getPlacesOfGame());
-                    updatedCityGame.setPlaying(cityGame.getPlaying());
-                    cityGamesService.saveCityGame(updatedCityGame);
-                    return new ResponseEntity<>(updatedCityGame, HttpStatus.OK);
-                })
-                .orElseGet(() -> {
-                    cityGamesService.saveCityGame(cityGame);
-                    return new ResponseEntity<>(cityGame, HttpStatus.NOT_FOUND);
-                });
-
-    }
+//    public ResponseEntity<CityGames> updateGame(@RequestBody CityGames cityGame, @PathVariable Long id){
+////        CityGames copiedCityGame = cityGamesService.findGameById(id);
+//
+//        Optional<CityGames> cityGameForUpdate = cityGamesService.findGameById(id);
+//        return cityGameForUpdate
+//                .map(updatedCityGame -> {
+//                    updatedCityGame.setNameOfGame(cityGame.getNameOfGame());
+//                    updatedCityGame.setCityForGame(cityGame.getCityForGame());
+//                    updatedCityGame.setNameOfGame(cityGame.getNameOfGame());
+//                    updatedCityGame.setAccessCode(cityGame.getAccessCode());
+//                    updatedCityGame.setCountryForGame(cityGame.getCountryForGame());
+//                    updatedCityGame.setDateForStartGame(cityGame.getDateForStartGame());
+//                    updatedCityGame.setDateForEndGame(cityGame.getDateForEndGame());
+//                    updatedCityGame.setPlacesOfGame(cityGame.getPlacesOfGame());
+//                    updatedCityGame.setPlaying(cityGame.getPlaying());
+//                    cityGamesService.saveCityGame(updatedCityGame);
+//                    return new ResponseEntity<>(updatedCityGame, HttpStatus.OK);
+//                })
+//                .orElseGet(() -> {
+//                    cityGamesService.saveCityGame(cityGame);
+//                    return new ResponseEntity<>(cityGame, HttpStatus.NOT_FOUND);
+//                });
+//
+//    }
 
 
     /**
@@ -219,46 +225,71 @@ public class CityGamesController {
     }
 
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
+    @GetMapping("/allcitygames")
+    public ResponseEntity<JsonArray> getAllCityGames() throws IOException{
 
+        List<CityGames> listOfGames = cityGamesService.getAllCityGames();
 
-//    @GetMapping("users/{id}")
-//    public ResponseEntity<User> getById(@PathVariable long id) {
-//
-//        Optional<User> user = userService.getById(id);
-//        if (user.isPresent()) {
-//            return new ResponseEntity<>(user.get(), HttpStatus.OK);
-//        } else {
-//            throw new RecordNotFoundException();
-//        }
-//    }
+        JsonArray gamesJsonArray = new JsonArray();
+        ObjectMapper objectMapper = new ObjectMapper();
 
-//    @Param("nameOfGame") String nameOfGame,
-//    @Param("accessCode") Integer accessCode,
-//    @Param("cityForGame") String cityForGame,
-//    @Param("dateForStartGame") String dateForStartGame,
-//    @Param("countryForGame") String countryForGame
+        for (CityGames gameObject:listOfGames) {
 
+            JsonObject gameJson = new Gson().fromJson(objectMapper.writeValueAsString(gameObject), JsonObject.class);
+            gamesJsonArray.add(gameJson);
 
-//    @GetMapping("/citygame")
-//    @ResponseBody
-//    public ResponseEntity<Long> getCityGameId(@RequestParam("nameOfGame") String nameOfGame,
-//                                              @RequestParam("accessCode") Integer accessCode,
-//                                              @RequestParam("cityForGame") String cityForGame,
-//                                              @RequestParam("dateForStartGame") String dateForStartGame,
-//                                              @RequestParam("countryForGame") String countryForGame){
-//        Long idGame = cityGamesService.getCityGameId(nameOfGame, accessCode, cityForGame, dateForStartGame,
-//                countryForGame);
-//
-//        System.out.println("IDGAME: -> " + idGame);
-//
-//        return new ResponseEntity<>(idGame, HttpStatus.OK);
-//    }
+        }
 
+        System.out.println(gamesJsonArray);
+
+        return ResponseEntity.ok(gamesJsonArray);
+    }
+
+    /**
+     *
+     * @return
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    @GetMapping("/only/allcitygames")
+    public ResponseEntity<JsonArray> getCityGamesOnly() throws IOException, IllegalStateException{
+
+        List<CityGames> listOfGames = cityGamesService.getCityGamesOnly();
+        List<JsonObject> listOfJsonGames = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonArray gamesJsonArray = new JsonArray();
+
+        for (CityGames gameObject: listOfGames) {
+
+            String json = objectMapper.writeValueAsString(gameObject);
+
+            JsonObject gameJson = new Gson().fromJson(json, JsonObject.class);
+            gameJson.remove("playing");
+            gameJson.remove("placesOfGame");
+
+            System.out.println(gameJson);
+
+            listOfJsonGames.add(gameJson);
+            gamesJsonArray.add(gameJson);
+        }
+
+        System.out.println(gamesJsonArray);
+
+        return ResponseEntity.ok(gamesJsonArray);
+    }
+
+    /**
+     *
+     * @param cityGames
+     * @return
+     */
     @PostMapping("/citygame")
-//    @ResponseBody
     public ResponseEntity<Long> getCityGameId(@RequestBody CityGames cityGames){
-//        Long testIdGame = cityGamesService.getCityGameId(cityGames.getNameOfGame(), cityGames.getAccessCode(), cityGames.getCityForGame(), cityGames.getDateForStartGame(),
-//                cityGames.getCountryForGame());
 
         Long testIdGame = cityGamesService.getCityGameId(cityGames.getNameOfGame(), cityGames.getAccessCode(),
                 cityGames.getCityForGame(), cityGames.getDateForStartGame(), cityGames.getCountryForGame());
@@ -276,8 +307,6 @@ public class CityGamesController {
         listParticipants.add(part1);
 
         cityGames.setPlaying(listParticipants);
-
-
 
         cityGamesService.saveCityGame(cityGames);
 
@@ -323,32 +352,4 @@ public class CityGamesController {
             }
         });
     }
-
-
-//    @PostMapping("/createNewGame")
-//    public String createNewCityGame(Model model){
-//        CityGames cityGame = new CityGames();
-//        model.addAttribute("cityGame", cityGame);
-//
-//    }
-
-
-//    /**
-//     * Save city game to database.
-//     *
-//     */
-//    @RequestMapping(value = "/city/game", method = RequestMethod.POST)
-//    public ResponseEntity<CityGames> createCityGame(@RequestBody @NotNull CityGames cityGame) {
-//        cityGamesService.saveCityGame(cityGame);
-//        return ResponseEntity.ok().body(cityGame);
-//    }
-//
-//    /**
-//     * List all games.
-//     *
-//     */
-//    @RequestMapping(value = "/city/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public Iterable<CityGames> listGames(Model model) {
-//        return cityGamesService.listAllGames();
-//    }
 }

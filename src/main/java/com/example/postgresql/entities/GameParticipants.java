@@ -27,7 +27,7 @@ public abstract class GameParticipants {
     @Column(name = "nickname", nullable = false)
     public String nickname;
 
-    @ManyToMany
+    @ManyToMany()
     @JoinTable(name = "playingGames",
             joinColumns = @JoinColumn(name = "idParticipant"),
             inverseJoinColumns = @JoinColumn(name = "idGame"))
@@ -51,14 +51,6 @@ public abstract class GameParticipants {
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
-
-//    public List<CityGames> getPlayingGames() {
-//        return playingGames;
-//    }
-//
-//    public void setPlayingGames(List<CityGames> playingGames) {
-//        this.playingGames = playingGames;
-//    }
 
     public Set<CityGames> getPlayingGames() {
         return playingGames;

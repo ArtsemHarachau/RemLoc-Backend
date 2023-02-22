@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class PlacesOfGameId implements Serializable {
 
     private Integer orderId;
-    private CityGames cityGame;
+    private Long cityGame;
 
     @Override
     public int hashCode() {

@@ -9,21 +9,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Repository
 //@CrossOrigin(origins = "http://localhost:4200")
 public interface CityGamesRepository extends JpaRepository<CityGames,Long> {
 
-
-//    @Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
-//    User findUserByUserStatusAndUserName(@Param("status") Integer userStatus,
-//                                         @Param("name") String userName);
-
-//    @Query("SELECT cg.idGame FROM CityGames cg WHERE cg.nameOfGame = :nameOfGame and cg.accessCode = :accessCode and " +
-//            "cg.cityForGame = :cityForGame and cg.dateForStartGame = :dateForStartGame and " +
-//            "cg.countryForGame = :countryForGame")
-//    @Query("SELECT cg.idGame FROM CityGames cg WHERE cg.nameOfGame = 'Hobbit' and cg.accessCode = 12345 and " +
-//            "cg.cityForGame = 'Poznan' and cg.dateForStartGame = '2023-01-16' and " +
-//            "cg.countryForGame = 'Poland'")
     @Query("SELECT cg.idGame FROM CityGames cg WHERE cg.nameOfGame = :nameOfGame and cg.accessCode = :accessCode and " +
         "cg.cityForGame = :cityForGame and cg.dateForStartGame = :dateForStartGame and " +
         "cg.countryForGame = :countryForGame")
@@ -34,17 +25,13 @@ public interface CityGamesRepository extends JpaRepository<CityGames,Long> {
                                       @Param("countryForGame") String countryForGame);
 
 
-//    CityGames findGameById(Long idGame);
+    @Query("FROM CityGames")
+    List<CityGames> getCityGamesOnly();
 
 
-//    @Query("SELECT cg.idGame FROM CityGames cg WHERE cg.nameOfGame = :nameOfGame and cg.accessCode = :accessCode and " +
-//            "cg.cityForGame = :cityForGame and cg.dateForStartGame = :dateForStartGame and " +
-//            "cg.countryForGame = :countryForGame")
-//    Long getCityGameIdByAnotherValues();
-//    Long getCityGameIdByAnotherValues(@RequestParam("nameOfGame") String nameOfGame,
-//                                      @RequestParam("accessCode") Integer accessCode,
-//                                      @RequestParam("cityForGame") String cityForGame,
-//                                      @RequestParam("dateForStartGame") String dateForStartGame,
-//                                      @RequestParam("countryForGame") String countryForGame);
+
+//    @Query("SELECT cg.idGame as idGame, cg.nameOfGame as nameOfGame, cg.accessCode, cg.cityForGame, cg.dateForStartGame, cg.dateForEndGame, cg.countryForGame FROM CityGames cg")
+//    List<Object[]> getCityGamesOnly();
+
 }
 

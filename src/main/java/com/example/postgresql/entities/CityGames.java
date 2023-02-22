@@ -1,6 +1,7 @@
 package com.example.postgresql.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -36,15 +37,15 @@ public class CityGames {
     private String countryForGame;
 
 
-    @ManyToMany(mappedBy = "playingGames", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "playingGames", fetch = FetchType.EAGER,cascade = CascadeType.ALL)
 //    @JsonIgnore
     @JsonManagedReference
     @JsonIgnore
     private Set<GameParticipants> playing = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "cityGame", fetch=FetchType.EAGER)
-//    @JsonManagedReference
+    @OneToMany(mappedBy = "cityGame", fetch = FetchType.EAGER)
+    @JsonManagedReference
 //    @JsonIgnore
     private Set<PlacesOfGame> placesOfGame = new HashSet<>();
 
@@ -103,22 +104,6 @@ public class CityGames {
     public void setCountryForGame(String countryForGame) {
         this.countryForGame = countryForGame;
     }
-
-//    public List<GameParticipants> getPlaying() {
-//        return playing;
-//    }
-//
-//    public void setPlaying(List<GameParticipants> playing) {
-//        this.playing = playing;
-//    }
-//
-//    public List<PlacesOfGame> getPlacesOfGame() {
-//        return placesOfGame;
-//    }
-//
-//    public void setPlacesOfGame(List<PlacesOfGame> placesOfGame) {
-//        this.placesOfGame = placesOfGame;
-//    }
 
     public Set<GameParticipants> getPlaying() {
         return playing;
