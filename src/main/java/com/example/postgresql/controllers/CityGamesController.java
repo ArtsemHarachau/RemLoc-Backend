@@ -187,6 +187,51 @@ public class CityGamesController {
         placesOfGameService.saveNewPlace(newPlace);
     }
 
+
+    @PostMapping("/addallplaces")
+    public void addAllPlacesToGame(@RequestBody String jsonString) throws IOException{
+
+        JsonArray jsonArray = new Gson().fromJson(jsonString, JsonArray.class);
+
+        for (JsonElement elem: jsonArray) {
+
+            JsonObject placeJson = elem.getAsJsonObject();
+
+            PlacesOfGame newPlace = new PlacesOfGame();
+            newPlace.setOrderId(placeJson.get("orderId").getAsInt());
+            newPlace.setAddress(placeJson.get("address").getAsString());
+            newPlace.setLatitudeCoord(placeJson.get("latitudeCoord").getAsDouble());
+            newPlace.setLongitudeCoord(placeJson.get("longitudeCoord").getAsDouble());
+            newPlace.setLegend(placeJson.get("legend").getAsString());
+            newPlace.setPhotoLink(placeJson.get("photoLink").getAsString());
+
+            JsonObject cityGameObject = placeJson.get("cityGame").getAsJsonObject();
+
+            Long gameId = cityGamesService.getCityGameId(
+                    cityGameObject.get("nameOfGame").getAsString(),
+                    cityGameObject.get("accessCode").getAsInt(),
+                    cityGameObject.get("cityForGame").getAsString(),
+                    cityGameObject.get("dateForStartGame").getAsString(),
+                    cityGameObject.get("countryForGame").getAsString());
+
+            CityGames cityGameForUpdate = cityGamesService.findGameById(gameId);
+
+            if(cityGameForUpdate == null){
+                System.out.println("This is null!");
+            }
+
+            newPlace.setCityGame(cityGameForUpdate);
+
+            Set<PlacesOfGame> setPlaces = new HashSet<>();
+            setPlaces.add(newPlace);
+
+            newPlace.getCityGame().setPlacesOfGame(setPlaces);
+
+            placesOfGameService.saveNewPlace(newPlace);
+        }
+    }
+
+
     @PostMapping("/updatecitygame/{id}")
 //    public ResponseEntity<CityGames> updateGame(@RequestBody CityGames cityGame, @PathVariable Long id){
 ////        CityGames copiedCityGame = cityGamesService.findGameById(id);
