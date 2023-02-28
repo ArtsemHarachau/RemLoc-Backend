@@ -193,6 +193,8 @@ public class CityGamesController {
 
         JsonArray jsonArray = new Gson().fromJson(jsonString, JsonArray.class);
 
+        initFirebase();
+
         for (JsonElement elem: jsonArray) {
 
             JsonObject placeJson = elem.getAsJsonObject();
@@ -228,7 +230,62 @@ public class CityGamesController {
             newPlace.getCityGame().setPlacesOfGame(setPlaces);
 
             placesOfGameService.saveNewPlace(newPlace);
+
+            if (cityGameForUpdate != null) {
+                addDataFirebase(newPlace, cityGameForUpdate.getNameOfGame());
+            }
         }
+    }
+
+    public void initFirebase() throws IOException {
+        FileInputStream serviceAccount = new FileInputStream("src\\main\\resources\\remloc1-fbe72-firebase-adminsdk-h130v-9966196e2e.json");
+
+        FirebaseOptions options = null;
+        try {
+            options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://remloc1-fbe72-default-rtdb.europe-west1.firebasedatabase.app/")
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        FirebaseApp.initializeApp(options);
+    }
+
+    private void addDataFirebase(PlacesOfGame newPlace, String nameOfGame) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+        Map<String, Object> updates = new HashMap<>();
+
+        String[] lang =new String[4];
+        lang[0] = "pl";
+        lang[1] = "en";
+        lang[2] = "uk";
+        lang[3] = "ru";
+
+        for (String partLang: lang
+             ) {
+            updates.put("/Games/"+nameOfGame+"/"+partLang +"/" + newPlace.getOrderId() +"/hint", newPlace.getPhotoLink());
+            updates.put("/Games/"+nameOfGame+"/"+partLang +"/" + newPlace.getOrderId() +"/latitude", newPlace.getLatitudeCoord());
+            updates.put("/Games/"+nameOfGame+"/"+partLang +"/" + newPlace.getOrderId() +"/legend", newPlace.getLegend());
+            updates.put("/Games/"+nameOfGame+"/"+partLang +"/" + newPlace.getOrderId() +"/longitude", newPlace.getLongitudeCoord());
+            updates.put("/Games/"+nameOfGame+"/"+partLang +"/" + newPlace.getOrderId() +"/placeName", newPlace.getAddress());
+
+        }
+
+
+
+        ref.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError error, DatabaseReference ref) {
+                if (error != null) {
+                    // An error occurred while updating the data
+                } else {
+                    // Data updated successfully!
+                }
+            }
+        });
     }
 
 
@@ -358,7 +415,7 @@ public class CityGamesController {
         return new ResponseEntity<>(testIdGame, HttpStatus.OK);
     }
 
-    public void initFirebase() throws IOException {
+    /*public void initFirebase() throws IOException {
         FileInputStream serviceAccount = new FileInputStream("src\\main\\resources\\remloc1-fbe72-firebase-adminsdk-h130v-9966196e2e.json");
 
         FirebaseOptions options = null;
@@ -396,5 +453,5 @@ public class CityGamesController {
                 }
             }
         });
-    }
+    }*/
 }
