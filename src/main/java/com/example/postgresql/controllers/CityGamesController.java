@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RestController
-@CrossOrigin(origins = "https://018f-83-21-185-125.eu.ngrok.io")
+@CrossOrigin(origins = "http://localhost:4200"/*"https://018f-83-21-185-125.eu.ngrok.io"*/)
 @RequestMapping("/api")
 public class CityGamesController {
 

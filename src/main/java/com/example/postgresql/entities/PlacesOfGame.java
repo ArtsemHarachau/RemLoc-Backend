@@ -25,10 +25,10 @@ public class PlacesOfGame implements Serializable {
     @Column(name = "longitudeCoord", nullable = false)
     private double longitudeCoord;
 
-    @Column(name = "legend", nullable = false)
+    @Column(name = "legend", columnDefinition = "TEXT", nullable = false)
     private String legend;
 
-    @Column(name = "photoLink", nullable = false)
+    @Column(name = "photoLink", columnDefinition = "TEXT", nullable = false)
     private String photoLink;
 
 
