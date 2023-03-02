@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://018f-83-21-185-125.eu.ngrok.io")
 @RequestMapping("/api")
 public class CityGamesController {
 
@@ -43,6 +43,9 @@ public class CityGamesController {
 
     @Autowired
     private PlacesOfGameService placesOfGameService;
+    
+    boolean firebase = false;
+
 
     /**
      *
@@ -193,7 +196,13 @@ public class CityGamesController {
 
         JsonArray jsonArray = new Gson().fromJson(jsonString, JsonArray.class);
 
-        initFirebase();
+
+        if(!firebase){
+            initFirebase();
+            firebase = true;
+        }
+
+//        initFirebase();
 
         for (JsonElement elem: jsonArray) {
 
